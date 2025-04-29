@@ -144,6 +144,10 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -161,16 +165,17 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://sams_6r85_user:54oyZZn6t619A3ohMTIosMREpuRv601Q@dpg-d088n67diees739218fg-a.oregon-postgres.render.com/sams_6r85"
+        "value": null
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel ContactUS {\n  id          Int      @id @default(autoincrement())\n  fullname    String\n  workemail   String   @unique\n  phonenumber String\n  catergory   String\n  message     String\n  findus      String\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n}\n\nmodel Subscriber {\n  id        Int      @id @default(autoincrement())\n  email     String   @unique\n  createdAt DateTime @default(now())\n\n  @@map(\"subscriber\") // Match the actual lowercase table name\n}\n",
-  "inlineSchemaHash": "d9e699b659cf914ba3f4c94ce84b68cddf0546053a8f1c50e39f8b0c6d78143c",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel ContactUS {\n  id          Int      @id @default(autoincrement())\n  fullname    String\n  workemail   String   @unique\n  phonenumber String\n  catergory   String\n  message     String\n  findus      String\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n}\n\nmodel Subscriber {\n  id        Int      @id @default(autoincrement())\n  email     String   @unique\n  createdAt DateTime @default(now())\n\n  @@map(\"subscriber\") // Match the actual lowercase table name\n}\n",
+  "inlineSchemaHash": "5daadc9b89fc85a881d7a6377e0e0a3e8daeaf5435d3e15c6fb3e11fa579223b",
   "copyEngine": true
 }
 config.dirname = '/'

@@ -7,7 +7,8 @@
     "start": "ts-node src/index.ts",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
