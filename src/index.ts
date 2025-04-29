@@ -2,6 +2,7 @@ import { prisma } from "./prisma/client";
 import express, { Request, Response } from 'express';
 import contactUsRoutes from "./routes/contactus.routes"
 import cors from 'cors'
+import subscriberRouter from './routes/subscribe';
 
 const app = express();
 app.use(express.json())
@@ -20,6 +21,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, Express with TypeScript!');
 });
 app.use('/api/contactus', contactUsRoutes)
+app.use('/api', subscriberRouter);
 
 async function startServer() {
     try {

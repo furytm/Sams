@@ -25,3 +25,11 @@ model ContactUS {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("subscriber") // Match the actual lowercase table name
+}

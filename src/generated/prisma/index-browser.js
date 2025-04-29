@@ -129,6 +129,12 @@ exports.Prisma.ContactUSScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SubscriberScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -141,7 +147,8 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  ContactUS: 'ContactUS'
+  ContactUS: 'ContactUS',
+  Subscriber: 'Subscriber'
 };
 
 /**
