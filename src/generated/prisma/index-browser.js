@@ -135,6 +135,22 @@ exports.Prisma.SubscriberScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  email: 'email',
+  password: 'password',
+  contactNumber: 'contactNumber',
+  schoolName: 'schoolName',
+  roleInSchool: 'roleInSchool',
+  studentSize: 'studentSize',
+  isVerified: 'isVerified',
+  otp: 'otp',
+  otpExpires: 'otpExpires',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -145,10 +161,16 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
   ContactUS: 'ContactUS',
-  Subscriber: 'Subscriber'
+  Subscriber: 'Subscriber',
+  User: 'User'
 };
 
 /**
