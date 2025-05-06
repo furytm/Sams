@@ -1,2 +1,0 @@
-ALTER TABLE "User" 
-ALTER COLUMN "otpExpires" DROP NOT NULL;

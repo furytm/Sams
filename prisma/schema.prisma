@@ -37,15 +37,17 @@ model User {
   id             String   @id @default(cuid())
   fullName       String
   email          String   @unique
-  password       String
+  username       String?  @unique
+  password       String?
   contactNumber  String
   schoolName     String
   roleInSchool   String
   studentSize    Int
   isVerified     Boolean  @default(false)
-  otp            String?  // optional, used before verification
-  otpExpires    DateTime? // Add this field
+  otp            String?
+  otpExpires     DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
 

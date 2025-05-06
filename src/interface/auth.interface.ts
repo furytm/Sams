@@ -1,11 +1,10 @@
 export interface RegisterDTO {
-    fullname: string;
+    fullName: string;
     email: string;
     contactNumber: string;
     schoolName: string;
-    role: string;
+    roleInSchool: string;
     studentSize: number;
-    password: string;
   }
   
   export interface VerifyOtpDTO {
