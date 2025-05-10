@@ -9,21 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContactusService = void 0;
-const client_1 = require("../prisma/client");
-exports.ContactusService = {
-    createContactUs(fullname, workemail, phonenumber, catergory, message, findus) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield client_1.prisma.contactUS.create({
-                data: {
-                    fullname,
-                    workemail,
-                    phonenumber,
-                    catergory,
-                    message,
-                    findus
-                },
-            });
+exports.sendOTPEmail = void 0;
+const nodemailer_config_1 = require("../config/nodemailer.config");
+const sendOTPEmail = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const info = yield nodemailer_config_1.transporter.sendMail({
+            from: process.env.SMTP_FROM,
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP code is: ${otp}`,
+            html: `<p>Hello,</p><p>Your OTP code is: <strong>${otp}</strong></p><p>This code expires in 10 minutes.</p>`,
         });
-    },
-};
+        console.log('OTP Email sent: ' + info.response);
+    }
+    catch (error) {
+        console.error('Error sending OTP email:', error);
+        throw new Error('Failed to send OTP');
+    }
+});
+exports.sendOTPEmail = sendOTPEmail;

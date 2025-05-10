@@ -15,5 +15,6 @@ export interface RegisterDTO {
   export interface LoginDTO {
     email: string;
     password: string;
+    rememberMe?: boolean
   }
   

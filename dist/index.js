@@ -14,11 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("./prisma/client");
 const express_1 = __importDefault(require("express"));
+const contactus_routes_1 = __importDefault(require("./routes/contactus.routes"));
+const cors_1 = __importDefault(require("cors"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const subscribe_1 = __importDefault(require("./routes/subscribe"));
+const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const app = (0, express_1.default)();
+app.use(express_1.default.json());
+app.use(body_parser_1.default.json());
 const port = 3000;
+app.use((0, cors_1.default)({
+    origin: "*", // Allows all origins
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true, // Allow cookies and authorization headers
+}));
 app.get('/', (req, res) => {
     res.send('Hello, Express with TypeScript!');
 });
+app.use('/api/contactus', contactus_routes_1.default);
+app.use('/api', subscribe_1.default);
+app.use('/api/auth', auth_routes_1.default);
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {

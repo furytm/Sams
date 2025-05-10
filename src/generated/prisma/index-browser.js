@@ -145,11 +145,27 @@ exports.Prisma.UserScalarFieldEnum = {
   schoolName: 'schoolName',
   roleInSchool: 'roleInSchool',
   studentSize: 'studentSize',
+  role: 'role',
   isVerified: 'isVerified',
+  resendCount: 'resendCount',
+  firstOtpSentAt: 'firstOtpSentAt',
+  otpSentCount: 'otpSentCount',
+  otpSentWindowStart: 'otpSentWindowStart',
   otp: 'otp',
   otpExpires: 'otpExpires',
+  resetToken: 'resetToken',
+  resetTokenExpires: 'resetTokenExpires',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  revoked: 'revoked'
 };
 
 exports.Prisma.SortOrder = {
@@ -166,12 +182,20 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.UserRole = exports.$Enums.UserRole = {
+  ADMIN: 'ADMIN',
+  TEACHER: 'TEACHER',
+  STUDENT: 'STUDENT',
+  PARENT: 'PARENT',
+  HEALTH_STAFF: 'HEALTH_STAFF',
+  FINANCE_STAFF: 'FINANCE_STAFF'
+};
 
 exports.Prisma.ModelName = {
   ContactUS: 'ContactUS',
   Subscriber: 'Subscriber',
-  User: 'User'
+  User: 'User',
+  RefreshToken: 'RefreshToken'
 };
 
 /**

@@ -5,6 +5,8 @@ import cors from 'cors'
 import bodyParser from 'body-parser';
 import subscriberRouter from './routes/subscribe';
 import authRouter from './routes/auth.routes';
+import { scheduleUserCleanup } from './jobs/deleteExpiredUsers.job';
+
 
 const app = express();
 app.use(express.json())
@@ -26,6 +28,8 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/contactus', contactUsRoutes)
 app.use('/api', subscriberRouter);
 app.use('/api/auth', authRouter);
+scheduleUserCleanup();
+
 
 async function startServer() {
     try {

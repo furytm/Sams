@@ -9,21 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContactusService = void 0;
+exports.SubscriberService = void 0;
 const client_1 = require("../prisma/client");
-exports.ContactusService = {
-    createContactUs(fullname, workemail, phonenumber, catergory, message, findus) {
+exports.SubscriberService = {
+    subscribe(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield client_1.prisma.contactUS.create({
-                data: {
-                    fullname,
-                    workemail,
-                    phonenumber,
-                    catergory,
-                    message,
-                    findus
-                },
+            const existingSubscriber = yield client_1.prisma.subscriber.findUnique({
+                where: { email },
             });
+            if (existingSubscriber) {
+                throw new Error('Email already subscribed');
+            }
+            const newSubscriber = yield client_1.prisma.subscriber.create({
+                data: { email },
+            });
+            return newSubscriber;
         });
-    },
+    }
 };
