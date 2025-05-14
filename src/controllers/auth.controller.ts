@@ -129,7 +129,7 @@ export const setAdminUsername = async (req: Request, res: Response):Promise<void
 
 // POST /auth/set-credentials-with-token
 // POST /auth/set-credentials
-export const setCredentials = async (req: Request, res: Response): Promise<void> => {
+export const setUsernameWithToken = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, username, password } = req.body;
 
