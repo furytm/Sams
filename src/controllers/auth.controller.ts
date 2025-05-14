@@ -128,33 +128,26 @@ export const setAdminUsername = async (req: Request, res: Response):Promise<void
 };
 
 // POST /auth/set-credentials-with-token
-export const setUsernameWithToken = async (req: Request, res: Response):Promise<void> => {
+// POST /auth/set-credentials
+export const setCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, username, password, token } = req.body;
+    const { email, username, password } = req.body;
 
-    if (!email || !username || !password || !token) {
-     res.status(400).json({ error: "All fields and token are required." });
-     return;
-    }
-    // ✅ Validate the token
-    const existingToken = await prisma.token.findUnique({ where: { token } });
-
-    if (!existingToken || existingToken.expiresAt < new Date()) {
-    res.status(400).json({ error: "Invalid or expired token." });
-    return;
+    if (!email || !username || !password) {
+      res.status(400).json({ error: "Email, username, and password are required." });
+      return;
     }
 
-    // ✅ Call shared service and pass role from token
     const result = await setUser({
       email,
       username,
       password,
-      role: existingToken.role, // passed to prevent tampering
+      // ❗ No need to pass role — it was already stored during registration
     });
 
     res.status(200).json(result);
   } catch (err: any) {
-    console.error("Set Credentials with Token Error:", err);
+    console.error("Set Credentials Error:", err);
     res.status(400).json({ error: err.message });
   }
 };
