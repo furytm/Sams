@@ -31,6 +31,7 @@
     "argon2": "^0.43.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
+    "cuid": "^3.0.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",

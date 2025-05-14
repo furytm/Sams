@@ -145,6 +145,7 @@ exports.Prisma.UserScalarFieldEnum = {
   schoolName: 'schoolName',
   roleInSchool: 'roleInSchool',
   studentSize: 'studentSize',
+  schoolId: 'schoolId',
   role: 'role',
   isVerified: 'isVerified',
   resendCount: 'resendCount',
@@ -168,6 +169,15 @@ exports.Prisma.RefreshTokenScalarFieldEnum = {
   revoked: 'revoked'
 };
 
+exports.Prisma.TokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  role: 'role',
+  schoolId: 'schoolId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -186,16 +196,15 @@ exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',
   TEACHER: 'TEACHER',
   STUDENT: 'STUDENT',
-  PARENT: 'PARENT',
-  HEALTH_STAFF: 'HEALTH_STAFF',
-  FINANCE_STAFF: 'FINANCE_STAFF'
+  PARENT: 'PARENT'
 };
 
 exports.Prisma.ModelName = {
   ContactUS: 'ContactUS',
   Subscriber: 'Subscriber',
   User: 'User',
-  RefreshToken: 'RefreshToken'
+  RefreshToken: 'RefreshToken',
+  Token: 'Token'
 };
 
 /**

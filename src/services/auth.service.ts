@@ -3,11 +3,12 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { generateOTP } from '../utils/otp.util';
 import { sendOTPEmail } from '../utils/sendOtp.util';
-import { RegisterDTO, VerifyOtpDTO, LoginDTO } from '../interface/auth.interface';
+import { RegisterDTO, VerifyOtpDTO,RegisterWithTokenDTO, LoginDTO } from '../interface/auth.interface';
 import { SetUsernameDTO } from '../interface/username.interface';
 import { sendResetEmail } from '../utils/sendResetEmail.util';
 import { generateResetToken } from '../utils/token.util';
 import * as crypto from 'crypto';
+import cuid from 'cuid';
 import { createTokens } from './token.service';
 
 
@@ -15,23 +16,28 @@ const OTP_EXPIRY_MINUTES = 10;
 // Constants controlling OTP resend policy
 const MAX_RESENDS = 3; // maximum number of OTP resends
 const RESEND_WINDOW_MINUTES = 10; // time window to enforce limit
+
+
+
 export const registerUser = async (data: RegisterDTO) => {
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   const otp = generateOTP();
   const expires = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60000);
   const now = new Date();
-  const windowStart = new Date(now.getTime() - 10 * 60 * 1000); // 10 mins ago
+  const windowStart = new Date(now.getTime() - RESEND_WINDOW_MINUTES * 60000);
 
   if (existing) {
     if (existing.isVerified) throw new Error('Email already in use');
 
-    // Check if still in the same 10-minute window
-    if (existing.otpSentWindowStart && existing.otpSentWindowStart > windowStart) {
-      if (existing.otpSentCount >= 3) {
+    // ⏳ Check OTP resend window
+    const inWindow = existing.otpSentWindowStart && existing.otpSentWindowStart > windowStart;
+
+    if (inWindow) {
+      if (existing.otpSentCount >= MAX_RESENDS) {
         throw new Error('You have reached the maximum OTP attempts. Try again later.');
       }
 
-      // Increment the counter
+      // ➕ Increment resend count
       await prisma.user.update({
         where: { email: data.email },
         data: {
@@ -41,7 +47,7 @@ export const registerUser = async (data: RegisterDTO) => {
         },
       });
     } else {
-      // Reset the window
+      // 🔁 Reset window and count
       await prisma.user.update({
         where: { email: data.email },
         data: {
@@ -57,15 +63,86 @@ export const registerUser = async (data: RegisterDTO) => {
     return { message: 'OTP resent successfully' };
   }
 
-  // Create a new user with initial OTP
+  // 🆕 New User: Create with OTP
   await prisma.user.create({
     data: {
       fullName: data.fullName,
       email: data.email,
       contactNumber: data.contactNumber,
       schoolName: data.schoolName,
-      roleInSchool: data.roleInSchool,
       studentSize: data.studentSize,
+      otp,
+      otpExpires: expires,
+      isVerified: false,
+      role: 'ADMIN', // ⬅️ Default for public registration
+      schoolId: cuid(),
+      otpSentCount: 1,
+      otpSentWindowStart: now,
+    },
+  });
+
+  await sendOTPEmail(data.email, otp);
+  return { message: 'OTP sent to email' };
+};
+
+
+export const registerWithToken = async (data: RegisterWithTokenDTO) => {
+  const tokenRecord = await prisma.token.findUnique({ where: { token: data.token } });
+
+  if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+    throw new Error('Invalid or expired token');
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+
+  const otp = generateOTP();
+  const expires = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60000);
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - RESEND_WINDOW_MINUTES * 60000);
+
+  if (existing) {
+    if (existing.isVerified) throw new Error('Email already in use');
+
+    // Check OTP send window
+    if (existing.otpSentWindowStart && existing.otpSentWindowStart > windowStart) {
+      if (existing.otpSentCount >= MAX_RESENDS) {
+        throw new Error('You have reached the maximum OTP attempts. Try again later.');
+      }
+
+      await prisma.user.update({
+        where: { email: data.email },
+        data: {
+          otp,
+          otpExpires: expires,
+          otpSentCount: existing.otpSentCount + 1,
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: { email: data.email },
+        data: {
+          otp,
+          otpExpires: expires,
+          otpSentCount: 1,
+          otpSentWindowStart: now,
+        },
+      });
+    }
+
+    await sendOTPEmail(data.email, otp);
+    return { message: 'OTP resent successfully' };
+  }
+
+  // New user registered via token (role and schoolId come from token)
+  await prisma.user.create({
+    data: {
+      fullName: data.fullName,
+      email: data.email,
+      contactNumber: data.contactNumber,
+      studentSize: 0,           // or set default if needed
+      schoolName: "",           // optional for non-admins
+      role: tokenRecord.role,
+      schoolId: tokenRecord.schoolId,
       otp,
       otpExpires: expires,
       isVerified: false,
@@ -128,7 +205,7 @@ export const setUser = async ({
     where: { email },
     data: {
       username, password: hashed,
-      role: role ?? "TEACHER",
+      role: role ?? "ADMIN",
     },
 
   });
@@ -148,6 +225,7 @@ export const loginUser = async ({ email, password, }: LoginDTO) => {
   const { accessToken, refreshToken } = await createTokens({
     id: user.id,
     role: user.role,
+   schoolId: user.schoolId, // ✅ Add this
   });
 
   return {

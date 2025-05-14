@@ -40,8 +40,6 @@ enum UserRole {
   TEACHER
   STUDENT
   PARENT
-  HEALTH_STAFF
-  FINANCE_STAFF
 }
 
 model User {
@@ -52,14 +50,15 @@ model User {
   password           String?
   contactNumber      String
   schoolName         String
-  roleInSchool       String
+  roleInSchool       String?
   studentSize        Int
-  role               UserRole       @default(TEACHER)
+  schoolId           String
+  role               UserRole       @default(ADMIN)
   isVerified         Boolean        @default(false)
   resendCount        Int            @default(0)
   firstOtpSentAt     DateTime?
   otpSentCount       Int            @default(0) // new
-  otpSentWindowStart DateTime? // new
+  otpSentWindowStart DateTime?
   otp                String?
   otpExpires         DateTime?
   resetToken         String?
@@ -77,4 +76,13 @@ model RefreshToken {
   createdAt DateTime @default(now())
   expiresAt DateTime
   revoked   Boolean  @default(false)
+}
+
+model Token {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  role      UserRole
+  schoolId  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

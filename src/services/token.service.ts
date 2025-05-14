@@ -1,13 +1,15 @@
 import { prisma } from '../prisma/client';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-
+import { UserRole } from '../generated/prisma';  // enum: STUDENT, TEACHER, PARENT
+import { TokenPayload } from 'src/interface/token.interface';
 const REFRESH_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-export async function createTokens(user: { id: string, role: string }) {
+
+export async function createTokens({ id, role, schoolId }: TokenPayload) {
   const accessToken = jwt.sign(
-    { userId: user.id, role: user.role },
-    process.env.JWT_SECRET!,
+    { userId: id, role, schoolId },
+    process.env.JWT_SECRET as string,
     { expiresIn: '15m' }
   );
 
@@ -17,12 +19,15 @@ export async function createTokens(user: { id: string, role: string }) {
   await prisma.refreshToken.create({
     data: {
       token: hashed,
-      userId: user.id,
+      userId: id,
       expiresAt: new Date(Date.now() + REFRESH_EXPIRES_IN),
     },
   });
 
-  return { accessToken, refreshToken: rawRefreshToken };
+  return {
+    accessToken,
+    refreshToken: rawRefreshToken,
+  };
 }
 
 export async function rotateRefreshToken(rawToken: string) {
@@ -61,3 +66,37 @@ export async function revokeAllUserTokens(userId: string) {
     data: { revoked: true },
   });
 }
+
+
+
+const generateToken = (length = 5): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let token = '';
+  for (let i = 0; i < length; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+};
+
+export const generateRoleToken = async (schoolId: string, role: UserRole) => {
+
+  const token = generateToken();
+
+  // Remove old token for this role+school
+  await prisma.token.deleteMany({
+    where: { schoolId, role },
+  });
+
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  const newToken = await prisma.token.create({
+    data: {
+      token,
+      role,
+      schoolId,
+      expiresAt,
+    },
+  });
+
+  return newToken;
+};
