@@ -6,9 +6,9 @@ import { TokenPayload } from 'src/interface/token.interface';
 const REFRESH_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 
-export async function createTokens({ id, role, schoolId }: TokenPayload) {
+export async function createTokens({ id, role, schoolId,schoolName }: TokenPayload) {
   const accessToken = jwt.sign(
-    { userId: id, role, schoolId },
+    { userId: id, role, schoolId,schoolName },
     process.env.JWT_SECRET as string,
     { expiresIn: '15m' }
   );
@@ -97,6 +97,7 @@ export const generateRoleToken = async (schoolId: string, role: UserRole) => {
       expiresAt,
     },
   });
+console.log("Generating token for role:", role);
 
   return newToken;
 };

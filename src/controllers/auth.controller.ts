@@ -110,15 +110,21 @@ export const setUsernameAndPassword = async (req: Request, res: Response) => {
   }
 }
 // POST /auth/set-credentials
-export const setAdminUsername = async (req: Request, res: Response):Promise<void> => {
+export const setAdminUsername = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, username, password } = req.body;
 
     if (!email || !username || !password) {
-    res.status(400).json({ error: "All fields are required." });
+      res.status(400).json({ error: "All fields are required." });
+      return;
     }
 
-    const result = await setUser({ email, username, password });
+    const result = await setUser({
+      email,
+      username,
+      password,
+      role: "ADMIN", // ✅ explicitly assign role for Admins
+    });
 
     res.status(200).json(result);
   } catch (err: any) {
@@ -128,7 +134,6 @@ export const setAdminUsername = async (req: Request, res: Response):Promise<void
 };
 
 // POST /auth/set-credentials-with-token
-// POST /auth/set-credentials
 export const setUsernameWithToken = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, username, password } = req.body;
@@ -142,16 +147,15 @@ export const setUsernameWithToken = async (req: Request, res: Response): Promise
       email,
       username,
       password,
-      // ❗ No need to pass role — it was already stored during registration
+      // ✅ No need to pass role — already saved during registration
     });
 
     res.status(200).json(result);
   } catch (err: any) {
-    console.error("Set Credentials Error:", err);
+    console.error("Set Credentials with Token Error:", err);
     res.status(400).json({ error: err.message });
   }
 };
-
 
 
 
@@ -166,7 +170,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const { email, password, rememberMe } = result.data;
 
-    const { accessToken, refreshToken } = await loginUser({ email, password });
+    const { accessToken, refreshToken,user } = await loginUser({ email, password });
 
     // Set refresh token as HTTP-only cookie
     res.cookie('refreshToken', refreshToken, {
@@ -178,7 +182,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       }),
     });
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ accessToken ,user });
   } catch (err: any) {
     console.error('Login error:', err);
     res.status(400).json({ error: err.message });

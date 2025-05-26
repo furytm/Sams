@@ -8,6 +8,7 @@ import authRouter from './routes/auth.routes';
 import { scheduleUserCleanup } from './jobs/deleteExpiredUsers.job';
 import tokenRouter from './routes/token.routes'
 import cookieParser from 'cookie-parser';
+import userRouter from './routes/user.routes'
 
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/contactus', contactUsRoutes)
 app.use('/api', subscriberRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/token', tokenRouter)
+app.use('/api/user', userRouter)
 app.get('/api/ping', (req, res) => {
   console.log(`[PING] Server is alive at ${new Date().toISOString()}`);
   res.status(200).json({ message: 'pong' });
