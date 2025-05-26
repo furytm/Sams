@@ -132,6 +132,14 @@ export const registerWithToken = async (data: RegisterWithTokenDTO) => {
     await sendOTPEmail(data.email, otp);
     return { message: 'OTP resent successfully' };
   }
+    // ✅ Lookup school name using schoolId from token
+  const school = await prisma.user.findFirst({
+    where: { schoolId: tokenRecord.schoolId, role: 'ADMIN' },
+    select: { schoolName: true },
+  });
+    const schoolName = school?.schoolName ?? "";
+    console.log("Assigning role:", tokenRecord.role);
+
 
   // New user registered via token (role and schoolId come from token)
   await prisma.user.create({
@@ -140,7 +148,7 @@ export const registerWithToken = async (data: RegisterWithTokenDTO) => {
       email: data.email,
       contactNumber: data.contactNumber,
       studentSize: 0,           // or set default if needed
-      schoolName: "",           // optional for non-admins
+      schoolName,           // optional for non-admins
       role: tokenRecord.role,
       schoolId: tokenRecord.schoolId,
       otp,
@@ -150,9 +158,10 @@ export const registerWithToken = async (data: RegisterWithTokenDTO) => {
       otpSentWindowStart: now,
     },
   });
+console.log(otp);
 
   await sendOTPEmail(data.email, otp);
-  return { message: 'OTP sent to email' };
+  return { message: 'OTP sent to email', otp };
 };
 
 
@@ -175,7 +184,9 @@ export const verifyUserOtp = async ({ email, otp }: VerifyOtpDTO) => {
     where: { email },
     data: { isVerified: true, otp: null, otpExpires: null },
   });
-  return { message: 'Account verified' };
+  return { message: 'Account verified'
+
+   };
 }
 
 /** 3. Set Username & Password: update user with username and password */
@@ -205,7 +216,7 @@ export const setUser = async ({
     where: { email },
     data: {
       username, password: hashed,
-      role: role ?? "ADMIN",
+      role: role ?? user.role,
     },
 
   });
@@ -225,12 +236,23 @@ export const loginUser = async ({ email, password, }: LoginDTO) => {
   const { accessToken, refreshToken } = await createTokens({
     id: user.id,
     role: user.role,
-   schoolId: user.schoolId, // ✅ Add this
+   schoolId: user.schoolId,
+  schoolName: user.schoolName
   });
+console.log("Login user role:", user.role, "schoolId:", user.schoolId);
 
   return {
     accessToken,
     refreshToken,
+    user:{
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      schoolId: user.schoolId,
+      schoolName: user.schoolName,
+    }
   };
 };
 
